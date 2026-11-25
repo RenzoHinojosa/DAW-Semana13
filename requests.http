@@ -1,0 +1,81 @@
+### Extensión "REST Client" (humao.rest-client): clic en "Send Request" sobre cada bloque
+@host = http://127.0.0.1:8000
+
+### 0. Ping público (csrf_exempt)
+GET {{host}}/api/ping/
+
+### 1. Raíz navegable (HATEOAS)
+GET {{host}}/api/
+
+### 2. Listar productos
+GET {{host}}/api/productos/
+
+### 3. Filtrar + ordenar + paginar
+GET {{host}}/api/productos/?status=activo&ordering=-created&page=1
+
+### 4. Rango de precio y stock bajo
+GET {{host}}/api/productos/?precio_min=10&precio_max=40&stock_max=20
+
+### 5. Búsqueda
+GET {{host}}/api/productos/?search=arroz
+
+### 6. Estadísticas (@action detail=False)
+GET {{host}}/api/productos/estadisticas/
+
+### 7. Detalle de un producto
+GET {{host}}/api/productos/1/
+
+### 8. Categorías (hipervinculadas)
+GET {{host}}/api/categorias/
+
+### 9. Productos activos de una categoría (@action detail=True)
+GET {{host}}/api/categorias/1/productos_activos/
+
+### 10. Crear producto (Basic Auth: demo / demo12345)
+POST {{host}}/api/productos/
+Authorization: Basic ZGVtbzpkZW1vMTIzNDU=
+Content-Type: application/json
+
+{
+  "nombre": "Galletas soda",
+  "descripcion": "Paquete x6",
+  "precio": "3.50",
+  "stock": 25,
+  "status": "activo",
+  "categoria": 1
+}
+
+### 11. Crear sin autenticar -> 403
+POST {{host}}/api/productos/
+Content-Type: application/json
+
+{ "nombre": "X", "precio": "1", "stock": 1, "status": "activo", "categoria": 1 }
+
+### 12. Validación cruzada -> 400 (activo con stock 0)
+POST {{host}}/api/productos/
+Authorization: Basic ZGVtbzpkZW1vMTIzNDU=
+Content-Type: application/json
+
+{ "nombre": "Malo", "precio": "5", "stock": 0, "status": "activo", "categoria": 1 }
+
+### 13. PATCH parcial (solo el propietario o staff)
+PATCH {{host}}/api/productos/1/
+Authorization: Basic YWRtaW46YWRtaW4xMjM0NQ==
+Content-Type: application/json
+
+{ "precio": "12.90" }
+
+### 14. DELETE
+DELETE {{host}}/api/productos/18/
+Authorization: Basic YWRtaW46YWRtaW4xMjM0NQ==
+
+### 15. Preflight CORS (inspeccione Access-Control-Allow-*)
+OPTIONS {{host}}/api/productos/
+Origin: http://localhost:5173
+Access-Control-Request-Method: POST
+
+### 16. Token CSRF para SPA
+GET {{host}}/api/csrf/
+
+### 17. Esquema OpenAPI
+GET {{host}}/api/schema/
